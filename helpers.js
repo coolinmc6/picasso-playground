@@ -14,3 +14,8 @@ function buildMatrix({ cols, dataRows }) {
     ]
   }
 }
+
+function buildFakeData() {
+  const categories = ['Energy', 'Materials', 'Industrials', 'Consumer', 'Discretionary', 'Consumer Staples', 'HealthCare', 'Financials', 'Information Technology']
+  
+}

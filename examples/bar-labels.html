@@ -97,44 +97,78 @@
       scale: 'v'
     }
 
+    const yScale = {
+      data: { extract: { field: 'Dim' } },
+      padding: 0.1
+    };
+
+    const vScale = {
+      data: { fields: ['Measure', 'Target'] },
+      expand: 0.1,
+      min: 0,
+    }
+
+    const settingsObject = {
+      collections: [{
+        key: 'data',
+        data: {
+          extract: {
+            field: 'Dim',
+            props: {
+              start: { field: 'Measure' },
+              end: { field: 'Target' }
+            }
+          }
+        }
+      }],
+      scales: {
+        y: yScale,
+        v: vScale,
+      },
+      components: [
+        yAxis,
+        xAxis,
+        box({ id: 'bars', start: 0, end: { field: 'Measure' }, width: 0.5, fill: '#fa0' }),
+        box({ id: 'target', start: { field: 'Target' }, end: { field: 'Target' }, width: 1.0, fill: '#111', minHeightPx: 3 }),
+        // labels({c: 'bars'}),
+        labels({c: 'target', position: 'opposite', align: 0, fontSize: 12, fill: '#666'}),
+        labels({c: 'target', position: 'outside', align: 0, fontSize: 12, fill: '#b36'}),
+        labels({c: 'bars', position: 'outside', align: 0.5, fontSize: 12, fill: '#b36'})
+      ]
+    }
+
     picasso.chart({
       element: document.querySelector('#container'),
       data,
-      settings: {
-        collections: [{
-          key: 'd',
-          data: {
-            extract: {
-              field: 'Dim',
-              props: {
-                start: { field: 'Measure' },
-                end: { field: 'Target' }
-              }
-            }
-          }
-        }],
-        scales: {
-          y: {
-            data: { extract: { field: 'Dim' } },
-            padding: 0.1
-          },
-          v: {
-            data: { fields: ['Measure', 'Target'] },
-            expand: 0.1,
-            min: 0,
-          }
-        },
-        components: [
-          yAxis,
-          xAxis,
-          box({ id: 'bars', start: 0, end: { field: 'Measure' }, width: 0.5, fill: '#fa0' }),
-          box({ id: 'target', start: { field: 'Target' }, end: { field: 'Target' }, width: 1.0, fill: '#111', minHeightPx: 3 }),
-          // labels({c: 'bars'}),
-          labels({c: 'target', position: 'opposite', align: 0, fontSize: 12, fill: '#666'}),
-          labels({c: 'target', position: 'outside', align: 0, fontSize: 12, fill: '#b36'}),
-          labels({c: 'bars', position: 'outside', align: 0.5, fontSize: 12, fill: '#b36'})
-        ]
-      }
+      // settings: {
+      //   collections: [{
+      //     key: 'data',
+      //     data: {
+      //       extract: {
+      //         field: 'Dim',
+      //         props: {
+      //           start: { field: 'Measure' },
+      //           end: { field: 'Target' }
+      //         }
+      //       }
+      //     }
+      //   }],
+      //   scales: {
+      //     y: yScale,
+      //     v: vScale,
+      //   },
+      //   components: [
+      //     yAxis,
+      //     xAxis,
+      //     box({ id: 'bars', start: 0, end: { field: 'Measure' }, width: 0.5, fill: '#fa0' }),
+      //     box({ id: 'target', start: { field: 'Target' }, end: { field: 'Target' }, width: 1.0, fill: '#111', minHeightPx: 3 }),
+      //     // labels({c: 'bars'}),
+      //     labels({c: 'target', position: 'opposite', align: 0, fontSize: 12, fill: '#666'}),
+      //     labels({c: 'target', position: 'outside', align: 0, fontSize: 12, fill: '#b36'}),
+      //     labels({c: 'bars', position: 'outside', align: 0.5, fontSize: 12, fill: '#b36'})
+      //   ]
+      // }
+      settings: settingsObject
     })
   </script>
 </body>

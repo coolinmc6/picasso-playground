@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Picasso Starter</title>
   <script src="https://unpkg.com/picasso.js"></script>
+  <script src="https://d3js.org/d3.v5.js"></script>
   <style>
     html, body {
       margin: 0;
@@ -15,7 +16,8 @@
     #container {
       /* height: 100%; */
       max-width: 1600px;
-      min-height: 600px;
+      /* min-height: 600px; */
+      height: 700px;
       position: relative;
     }
     </style>
@@ -25,11 +27,49 @@
 
 
   <script>
-    const data = [{"type":"matrix","data":[["Dim","Measure","Target"],["A",73.91545552369752,79.35996104019546],["B",86.23961320738496,88.35753008636713],["C",50.8177350798356,46.562687859676615],["D",51.97131753310758,59.56063066196492]]}]
+    const randomNumber = () => (Math.random() * 50) + 30
+    const buildData = () => {
+      let keys = 'EFGHIJKLMNOPQRSTUV';
+      let parent = []
+      for(let c of keys) {
+        let arr = [c]
+        let n1 = randomNumber();
+        let n2 = randomNumber();
+        arr.push(n1, n2)
+        parent.push(arr);
+      }
+      return parent;
+    }
+    let numerical = [["A",73.91545552369752,79.35996104019546],["B",86.23961320738496,88.35753008636713],["C",50.8177350798356,46.562687859676615],["D",51.97131753310758,59.56063066196492],
+        ...buildData()].sort((a,b) => b[1] - a[1])
 
+
+    const rawData = [{
+      "type":"matrix",
+      "data":[
+        ["Dim","Measure","Target"],
+        ...numerical,
+      ]
+    }]
+
+    const data = rawData;
+
+    // =====================================================
+    const myInterpolator = d3.interpolateHsl;
+
+    // Color Function => returns color based on index
+    const color = d3.scaleLinear().domain([1, data[0].data.length])
+      .interpolate(myInterpolator)
+      .range(
+        [
+          d3.rgb('#870064'),
+          d3.rgb('#35DAA1'),
+        ],
+      );
+    
     // ===========
     // Build a Box
-    function createBox({ id, start, end, width, fill, minHeightPx }) {
+    function createBox({ id, start, end, width, fill, minHeightPx, strokeWidth = 0, stroke = 'transparent', opacity = 1, sort = null }) {
       const box = {
         key: id,      // all components should have a unique
         type: 'box',  // 'box' is a Picasso type; all components must have a type
@@ -39,9 +79,11 @@
             props: { 
               start,      // For building a box, where do we start? At 0? Where do we start drawing?
               end         // Where do we end? At the value (like most bars)?
-            }
+            },
+            sort,
           }
         },
+        sort,
         settings: {     // every component has a settings object that specifies everything we need to know
           orientation: 'horizontal',  // how do we want our bars ("box" in Picasso talk) oriented => https://picassojs.com/docs/component-box.html#api-reference
           major: { scale: 'y' },      // the scale for the major axis which is the dimension
@@ -49,11 +91,61 @@
           box: {        // these are the properties that describe the shape of the box
             width,
             fill,
-            minHeightPx
+            minHeightPx,
+            strokeWidth,
+            stroke,
+            opacity,
           }
         }
       }
       return box;
+    }
+
+    // =============
+    // Build Labels
+    function createLabel({ component, justify = 0, align = 0.5, position = 'inside', fontSize = 16, fill = '#111', direction = 'right'  }) {
+      const label = {
+        type: 'labels',     // component type; for a label it's "labels"
+        displayOrder: 2,    // needs to be higher than box
+        settings: {
+          sources: [{       
+            component: component,
+            selector: 'rect',
+            strategy: {
+              type: 'bar',
+              settings: {
+                direction,
+                fontSize,
+                labels: [{
+                  placements: [{
+                    position,
+                    fill,
+                    justify
+                  }],
+                  label: function label(d) {
+                    return (d.data.end.label).toFixed(2);
+                  }
+                }]
+              }
+            }
+          }]
+        }
+      }
+      return label;
+    }
+
+    // =============
+    // Build Tooltip
+    function createTooltip({ id, placement = 'pointer', delay = 0, }) {
+
+      return {
+        key: id,
+        type: 'tooltip',
+        settings: {
+          placement,
+          delay,
+        }
+      }
     }
 
     // =============
@@ -105,16 +197,34 @@
       components: [
         yAxis,
         xAxis,
-        createBox({ id: 'cm-box', start: 0, end: { field: 'Measure' }, width: 0.5, fill: '#0984e3'})
-      ]
+        createBox({ id: 'cm-box', start: 0, end: { field: 'Measure' }, width: 0.08, fill: (d,i) => color(i), opacity: 0.5, displayOrder: 10, sort: (a,b) => a.value - b.value }),
+        createBox({ id: 'clear-box', start: 0, end: { field: 'Measure' }, width: 1.0, fill: 'transparent', stroke: '#000', strokeWidth: 0, sort: (a,b) => a.value - b.value }),
+        createBox({ id: 'end-line', start: { field: 'Measure' }, end: { field: 'Measure' }, width: 0.3, fill: 'transparent', strokeWidth: '2', stroke: (d,i) => color(i) }),
+        createLabel({ component: 'clear-box', position: 'outside', direction: 'right', fontSize: 14 }),
+        createTooltip({ id: 'tooltip', delay: 250, })
+      ],
+      interactions: [{
+        type: 'native',
+        events: {
+          mousemove(e) {
+            const tooltip = this.chart.component('tooltip');
+            tooltip.emit('show', e);
+          },
+          mouseleave(e) {
+            const tooltip = this.chart.component('tooltip');
+            tooltip.emit('hide');
+          }
+        }
+
+      }]
     }
 
     // ============
     // Call Picasso to build the chart
     picasso.chart( {
-      element: document.getElementById('#container'),
+      element: document.getElementById('container'),
       data,
-      settings: settingsObject
+      settings: {...settingsObject}
     })
 
     console.log('hey there')
