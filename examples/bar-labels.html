@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Bar Labels</title>
+  <script src="https://unpkg.com/picasso.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #container {
+      height: 100%;
+      position: relative;
+    }
+    </style>
+</head>
+<body>
+  <div id="container"></div>
+
+
+  <script>
+    const data = [{"type":"matrix","data":[["Dim","Measure","Target"],["A",73.91545552369752,79.35996104019546],["B",86.23961320738496,88.35753008636713],["C",50.8177350798356,46.562687859676615],["D",51.97131753310758,59.56063066196492]]}]
+    console.log(data);
+    const box = ({ id,start,end,width,fill,minHeightPx}) => {
+      const b = {
+        key: id,
+        type: 'box',
+        data: {
+          extract: {
+            field: 'Dim',
+            props: {
+              start,
+              end
+            }
+          }
+        },
+        settings: {
+          orientation: 'horizontal',
+          major: { scale: 'y' },
+          minor: { scale: 'v' },
+          box: {
+            width,
+            fill,
+            minHeightPx
+          }
+        }
+      };
+      
+      return b;
+    }
+    const labels = ({ c, justify = 0, align = 0.5, position = 'inside', fontSize = 16, fill = '#111' }) => {
+      return {
+        type: 'labels',
+        displayOrder: 2,
+        settings: {
+          sources: [{
+            component: c,
+            selector: 'rect',
+            strategy: {
+              type: 'bar',
+              settings: {
+                direction: 'right',
+                fontSize,
+                align,
+                labels: [{
+                  placements: [{
+                    position,
+                    fill,
+                    justify
+                  }],
+                  label: function label(d) {
+                    return (d.data.end.label).toFixed(2);
+                  }
+                }]
+              }
+            }
+          }]
+        }
+      };
+    }
+
+    const yAxis = {
+      type: 'axis', 
+      dock: 'left',
+      scale: 'y'
+    }
+
+    const xAxis = {
+      type: 'axis', 
+      dock: 'bottom',
+      scale: 'v'
+    }
+
+    picasso.chart({
+      element: document.querySelector('#container'),
+      data,
+      settings: {
+        collections: [{
+          key: 'd',
+          data: {
+            extract: {
+              field: 'Dim',
+              props: {
+                start: { field: 'Measure' },
+                end: { field: 'Target' }
+              }
+            }
+          }
+        }],
+        scales: {
+          y: {
+            data: { extract: { field: 'Dim' } },
+            padding: 0.1
+          },
+          v: {
+            data: { fields: ['Measure', 'Target'] },
+            expand: 0.1,
+            min: 0,
+          }
+        },
+        components: [
+          yAxis,
+          xAxis,
+          box({ id: 'bars', start: 0, end: { field: 'Measure' }, width: 0.5, fill: '#fa0' }),
+          box({ id: 'target', start: { field: 'Target' }, end: { field: 'Target' }, width: 1.0, fill: '#111', minHeightPx: 3 }),
+          labels({c: 'bars'}),
+          labels({c: 'target', position: 'opposite', align: 0, fontSize: 12, fill: '#666'})
+        ]
+      }
+    })
+  </script>
+</body>
+</html>
