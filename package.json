@@ -1,0 +1,12 @@
+{
+  "name": "picasso-playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {},
+  "author": "",
+  "license": "ISC"
+}

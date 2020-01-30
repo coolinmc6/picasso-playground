@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picasso Starter</title>
+  <script src="https://unpkg.com/picasso.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #container {
+      /* height: 100%; */
+      max-width: 1600px;
+      min-height: 600px;
+      position: relative;
+    }
+    </style>
+</head>
+<body>
+  <div id="container"></div>
+
+
+  <script>
+    const data = [{"type":"matrix","data":[["Dim","Measure","Target"],["A",73.91545552369752,79.35996104019546],["B",86.23961320738496,88.35753008636713],["C",50.8177350798356,46.562687859676615],["D",51.97131753310758,59.56063066196492]]}]
+
+    // ===========
+    // Build a Box
+    function createBox({ id, start, end, width, fill, minHeightPx }) {
+      const box = {
+        key: id,      // all components should have a unique
+        type: 'box',  // 'box' is a Picasso type; all components must have a type
+        data: {
+          extract: {
+            field: 'Dim', // Dimension of the data => this how we are categorizing the data. This tells Picasso the dimension
+            props: { 
+              start,      // For building a box, where do we start? At 0? Where do we start drawing?
+              end         // Where do we end? At the value (like most bars)?
+            }
+          }
+        },
+        settings: {     // every component has a settings object that specifies everything we need to know
+          orientation: 'horizontal',  // how do we want our bars ("box" in Picasso talk) oriented => https://picassojs.com/docs/component-box.html#api-reference
+          major: { scale: 'y' },      // the scale for the major axis which is the dimension
+          minor: { scale: 'v' },      // the scale for the minor axis (typically the measure)
+          box: {        // these are the properties that describe the shape of the box
+            width,
+            fill,
+            minHeightPx
+          }
+        }
+      }
+      return box;
+    }
+
+    // =============
+    // Axes
+    const yAxis = {
+      type: 'axis', 
+      dock: 'left',
+      scale: 'y'
+    }
+
+    const xAxis = {
+      type: 'axis', 
+      dock: 'bottom',
+      scale: 'v'
+    }
+
+    // =============
+    // Scales
+    const yScale = {
+      data: { extract: { field: 'Dim' } },
+      padding: 0.1
+    }
+
+    const vScale = {
+      data: { fields: ['Measure', 'Target'] },
+      expand: 0.1,
+      min: 0
+    }
+
+    // ============
+    // Master Settings Object
+    const settingsObject = {
+      collections: [{
+        key: 'data',
+        data:  {
+          extract: {
+            field: 'Dim', 
+            props: {
+              start: { field: 'Measure' },
+              end: { field: 'Target' }
+            }
+          }
+        }
+      }],
+      scales: {
+        y: yScale,
+        v: vScale
+      },
+      components: [
+        yAxis,
+        xAxis,
+        createBox({ id: 'cm-box', start: 0, end: { field: 'Measure' }, width: 0.5, fill: '#0984e3'})
+      ]
+    }
+
+    // ============
+    // Call Picasso to build the chart
+    picasso.chart( {
+      element: document.getElementById('#container'),
+      data,
+      settings: settingsObject
+    })
+
+    console.log('hey there')
+  </script>
+</body>
+</html>

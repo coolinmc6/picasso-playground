@@ -13,7 +13,9 @@
       height: 100%;
     }
     #container {
-      height: 100%;
+      /* height: 100%; */
+      max-width: 1600px;
+      min-height: 600px;
       position: relative;
     }
     </style>
@@ -127,8 +129,10 @@
           xAxis,
           box({ id: 'bars', start: 0, end: { field: 'Measure' }, width: 0.5, fill: '#fa0' }),
           box({ id: 'target', start: { field: 'Target' }, end: { field: 'Target' }, width: 1.0, fill: '#111', minHeightPx: 3 }),
-          labels({c: 'bars'}),
-          labels({c: 'target', position: 'opposite', align: 0, fontSize: 12, fill: '#666'})
+          // labels({c: 'bars'}),
+          labels({c: 'target', position: 'opposite', align: 0, fontSize: 12, fill: '#666'}),
+          labels({c: 'target', position: 'outside', align: 0, fontSize: 12, fill: '#b36'}),
+          labels({c: 'bars', position: 'outside', align: 0.5, fontSize: 12, fill: '#b36'})
         ]
       }
     })
