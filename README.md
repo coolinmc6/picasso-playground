@@ -1,4 +1,6 @@
+# README
 
+See the charts in this playground live on [https://coolinmc6.github.io/picasso-playground/](https://coolinmc6.github.io/picasso-playground/).
 
 ### Dimension vs Measures
 

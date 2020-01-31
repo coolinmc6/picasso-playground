@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picasso Starter</title>
+  <script src="https://unpkg.com/picasso.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #container {
+      /* height: 100%; */
+      max-width: 1800px;
+      min-height: 400px;
+      height: 500px;
+      position: relative;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a>
+  <div id="container"></div>
+
+
+  <script>
+    // Building a Scatter Plot
+
+    // #0 - Understand the data and desired chart
+    // I have four data points per row: Year, Month, Sales, Margin but really Year and Month describe the date.
+    //    - in the example, the data is aggregated so I'll have to do that and then breakout by year
+    // There is one dimension: Year that is aggregated
+    // And two measures: Sales and Margin
+    // In the example chart, I am plotting Margin on the x-axis and Sales on the y-axis. The size is totally random, which I don't like.
+    //    - when I redo this, I'll create another column
+
+    // #1 - Get the data
+    let data = [{"type":"matrix","data":[["Year","Month","Sales","Margin"],["2010","Jan",1106,7],["2010","Feb",5444,53],["2010","Mar",147,64],["2010","Apr",7499,47],["2010","May",430,62],["2010","June",9735,13],["2010","July",7435,15],["2011","Jan",1482,45],["2011","Feb",2659,76],["2011","Mar",1261,73],["2011","Apr",3085,56],["2011","May",3035,91],["2011","June",7691,88],["2011","July",3012,81],["2012","Jan",7980,61],["2012","Feb",2564,22],["2012","Mar",7957,98],["2012","Apr",5809,1],["2012","May",429,2],["2012","June",6757,77],["2012","July",9415,92]]}]
+    console.log(data)
+    const newData = data[0].data.map((arr,i) => {
+      if(i === 0) return [...arr, "Sales People"]
+      let count = Math.floor(Math.random() * 25)
+      return [...arr, count]
+    })
+
+    data[0].data = newData
+
+    // #2: Create scales
+    // There are a few scales:
+    //    - x-axis: Margin
+    //    - y-axis: Sales
+    //    - color: Year
+    const xScale = {
+      data: {
+        field: 'Margin',
+      },
+      expand: 0.1       // what does expand mean?
+    }
+
+    const yScale = {
+      data: {
+        field: 'Sales',
+        
+      },
+      expand: 0.2,
+      invert: true
+    }
+
+    const cScale = {
+      data: {
+        field: 'Year'
+      },
+      type: 'color'
+    }
+
+    const sScale = {
+      data: {
+        field: 'Sales People'
+      }
+    }
+
+
+    // #3: Create Axes
+    const xAxis = {
+      key: 'x-axis',
+      type: 'axis',
+      scale: 'x',
+      dock: 'bottom'
+    }
+
+    const yAxis = {
+      key: 'y-axis',
+      type: 'axis',
+      scale: 'y',
+      dock: 'left'
+    }
+
+    // #4: Create Legend
+    const legend = {
+      type: 'legend-cat',
+      dock: 'right',
+      scale: 'color'
+    }
+
+    // #5: Create Points
+    const points = {
+      key: 'points',
+      type: 'point',
+      data: {
+        extract: {
+          field: 'Month',
+          props: {
+            y: { field: 'Sales' },
+            x: { field: 'Margin' },
+            size: { field: 'Sales People' },
+            group: { field: 'Year' }
+          }
+        }
+      },
+      settings: {
+        x: { scale: 'x' },
+        y: { scale: 'y' },
+        shape: 'circle',
+        size: { scale: 's' },
+        strokeWidth: 2,
+        stroke: '#fff',
+        opacity: 0.8,
+        fill: { scale: 'color', ref: 'group' }
+
+      }
+    }
+
+    // Last Step: Display Chart
+    picasso.chart({
+      element: document.getElementById('container'),
+      data,
+      settings: {
+        scales: {
+          x: xScale,
+          y: yScale,
+          color: cScale,
+          s: sScale,
+        },
+        components: [
+          xAxis,
+          yAxis,
+          legend,
+          points,
+          
+        ]
+        
+      }
+    })
+
+  </script>
+</body>
+</html>
