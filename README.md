@@ -2,6 +2,15 @@
 
 See the charts in this playground live on [https://coolinmc6.github.io/picasso-playground/](https://coolinmc6.github.io/picasso-playground/).
 
+## Chart Directory
+
+|Chart|Picasso.js Example|My Work|
+|:---:|:---|:---|
+|Bar with Labels|||
+|Line|||
+|Point Distribution|||
+|Scatterplot|||
+
 ### Dimension vs Measures
 
 **Dimension**
