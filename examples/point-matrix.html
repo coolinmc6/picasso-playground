@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Point Matrix Example</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://unpkg.com/picasso.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #container {
+      /* height: 100%; */
+      max-width: 1600px;
+      min-height: 600px;
+      position: relative;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a>
+  <div id="container"></div>
+
+
+  <script>
+    const data = [{"type":"matrix","data":[["Year","Month","Sales","Margin"],["2010","Jan",6705,69],["2010","Feb",700,80],["2010","Mar",7978,6],["2010","Apr",276,75],["2010","May",6653,61],["2010","June",786,49],["2010","July",710,63],["2010","Aug",1720,43],["2010","Sep",5902,66],["2010","Oct",1385,96],["2010","Nov",6320,94],["2010","Dec",6787,90],["2011","Jan",9131,21],["2011","Feb",4235,11],["2011","Mar",1644,78],["2011","Apr",7740,32],["2011","May",6862,32],["2011","June",7410,62],["2011","July",4065,4],["2011","Aug",9229,9],["2011","Sep",5120,57],["2011","Oct",8544,51],["2011","Nov",9073,55],["2011","Dec",7770,40],["2012","Jan",459,48],["2012","Feb",1345,84],["2012","Mar",9536,38],["2012","Apr",7285,82],["2012","May",9697,33],["2012","June",6789,69],["2012","July",7381,82],["2012","Aug",8339,31],["2012","Sep",7728,33],["2012","Oct",1321,31],["2012","Nov",3258,18],["2012","Dec",7513,63],["2013","Jan",5686,40],["2013","Feb",9565,69],["2013","Mar",5309,25],["2013","Apr",3775,28],["2013","May",9117,86],["2013","June",3877,22],["2013","July",6268,50],["2013","Aug",3449,99],["2013","Sep",5938,46],["2013","Oct",7718,74],["2013","Nov",2825,99],["2013","Dec",5619,90],["2014","Jan",4968,36],["2014","Feb",6894,75],["2014","Mar",5549,32],["2014","Apr",5696,21],["2014","May",9510,74],["2014","June",2085,5],["2014","July",3526,35],["2014","Aug",5308,95],["2014","Sep",4465,81],["2014","Oct",2666,24],["2014","Nov",4013,52],["2014","Dec",6189,39]]}];
+    picasso.chart({
+      element: document.querySelector('#container'),
+      data,
+      settings: {
+        scales: {
+          years: {
+            data: {
+              extract: { field: 'Year' }
+            }
+          },
+          months: {
+            data: {
+              extract: { field: 'Month' }
+            }
+          },
+          s: {
+            data: {
+              field: 'Sales'
+            }
+          },
+          col: {
+            data: { field: 'Sales' },
+            type: 'color'
+          }
+        },
+        components: [{
+          key: 'y-axis',
+          type: 'axis',
+          scale: 'years',
+          dock: 'left'
+        }, {
+          key: 'x-axis',
+          type: 'axis',
+          scale: 'months',
+          dock: 'bottom'
+        }, {
+          key: 'p',
+          type: 'point',
+          data: {
+            extract: {
+              field: 'Month',
+              props: {
+                mm: { field: 'Month' },
+                size: { field: 'Sales' },
+                group: { field: 'Year' }
+              }
+            }
+          },
+          settings: {
+            x: { scale: 'months' },
+            y: { scale: 'years', ref: 'group' },
+            size: { scale: 's' },
+            fill: { scale: 'col', ref: 'size' }
+          }
+        }]
+      }
+    })
+  </script>
+</body>
+</html>
