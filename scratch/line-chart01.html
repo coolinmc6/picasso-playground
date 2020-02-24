@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picasso Starter</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://unpkg.com/picasso.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #container {
+      /* height: 100%; */
+      max-width: 1100px;
+      min-height: 600px;
+      position: relative;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a>
+  <button class="update">Update</button>
+  <div id="container"></div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    
+    let next = 2;
+    const newRandom = () => Math.floor(Math.random() * 25)
+
+    $('.update').on('click', function() {
+      let arr = [next, newRandom()]
+      next++;
+      buildChart();
+    })
+
+    const data = [{
+      type: 'matrix',
+      data: [
+        ["Step", "Size"],
+        [0, 10],
+        [1, 15]
+      ]
+    }]
+
+    const yScale = {
+      data: {
+        extract: {
+          field: 'Size'
+        }
+      },
+      invert: true
+    };
+
+    const xScale = {
+      data: {
+        extract: {
+          field: 'Step'
+        }
+      }
+    }
+
+    const yAxis = {
+      key: 'y-axis',
+      type: 'axis',
+      dock: 'left',
+      scale: 'yScale'
+    }
+
+    const xAxis = {
+      key: 'x-axis',
+      type: 'axis',
+      dock: 'bottom',
+      scale: 'xScale'
+    }
+
+    const points = {
+      type: 'line',
+      data: {
+        extract: {
+          field: 'Size'
+        }
+      },
+      settings: {
+        coordinates: {
+          major: { scale: 'xScale' },
+          minor: { scale: 'yScale' }
+          // major: 0.5,
+          // minor: 0.5,
+          layerId: { ref: 'year' }
+        },
+        orientation: 'horizontal',
+        layers: {
+          curve: 'linear',
+          line: {
+            stroke: '#000',
+            strokeWidth: 2
+          },
+          area: {
+            fill: '#000'
+          }
+        }
+      }
+    }
+
+    const chartObj = {
+      element: document.getElementById('container'),
+      data,
+      settings: {
+        scales: { yScale, xScale },
+        components: [ yAxis, xAxis, points ]
+      }
+    }
+
+    picasso.chart(chartObj);
+    function buildChart() {
+      
+    }
+
+    window.onload = () => {
+      buildChart()
+    }
+
+    
+  </script>
+</body>
+</html>
