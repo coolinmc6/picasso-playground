@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picasso Starter</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    .line {
+      fill: none;
+      stroke-width: 1.5px;
+      stroke: #ddd;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a><br></br>
+  <button class="update-data">Update Data</button></br>
+  <div id="container"></div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    // #1 - Build Fake Data
+    let truth = 40;
+    let power = 50;
+    
+    const steps = new Array(50).fill('').reduce((acc, item, i) => {
+      const step = i + 1;
+      const direction = Math.random() < 0.5
+      const str = Math.random()*3
+      truth += (direction ? Math.random() : Math.random() * -1)*str
+      power += (direction ? Math.random()*-1 : Math.random())*str
+      acc[0].push({x: step, y: truth, color: '#0984e3'})
+      acc[1].push({x: step, y: power, color: '#d63031'})
+      return acc
+    }, [[],[]])
+
+    console.log(steps);
+
+    // D3 margin 
+    const margin = {top: 50, left: 30, right: 30, bottom: 50}
+    const height = 500;
+    const width = 800;
+
+    // Add svg to page
+    const svg = d3.select('body').append('svg')
+                  .attr('height', height).attr('width', width)
+                  .append('g')
+                  .attr('transform', `translate(${margin.left},${margin.right})`)
+    
+    // Create Scales
+    let xScale = d3.scaleLinear().range([0, width - margin.left - margin.right]).domain([0, steps[0].length - 1])
+    let yScale = d3.scaleLinear().range([height - margin.top - margin.bottom, 0]).domain([0, 100])
+
+    // Create the Line Generator
+    const line = d3.line().x((d,i) => xScale(i)).y((d) => { console.log(d); return yScale(d.y)})
+
+    // Create Axes
+    let yAxis = d3.axisLeft().scale(yScale);
+    let xAxis = d3.axisBottom().scale(xScale)
+
+    if(svg.selectAll('.y-axis').empty()) {
+      svg.append('g').attr('class', 'y-axis').call(yAxis)
+    } else {
+      svg.selectAll(".y-axis").transition().duration(1500).call(yAxis);
+    }
+
+    if(svg.selectAll('.x-axis').empty()) {
+      svg.append('g').attr('class', 'x-axis').attr('transform', `translate(0,${height - margin.top - margin.bottom})`).call(xAxis)
+    } else {
+      svg.selectAll(".x-axis").transition().duration(1500).call(xAxis);
+    }
+
+    const lines = svg.selectAll('.line').data(steps).attr('class', 'line')
+
+    lines.exit().remove();
+
+    lines.enter().append('path')
+    .attr('class', 'line')
+    .attr('d', line)
+    .style('stroke', (d) => {
+      return d[0].color
+    })
+    .merge(lines)
+    .transition().duration(500)
+    .attr("d", line)
+    
+
+    function updateScales() {
+      xScale.domain([0, steps[0].length - 1])
+      xAxis = d3.axisBottom().scale(xScale)
+      svg.selectAll(".x-axis").transition().duration(500).call(xAxis)
+    }
+
+    
+
+    $('.update-data').on('click', function() {
+      // get last step
+      let step = steps[0].length + 1
+      const direction = Math.random() < 0.5
+      const str = Math.random()*3
+      truth += (direction ? Math.random() : Math.random() * -1)*str
+      power += (direction ? Math.random()*-1 : Math.random())*str
+      steps[0].push({x: step, y: truth, color: '#0984e3'})
+      steps[1].push({x: step, y: power, color: '#d63031'})
+
+    })
+    
+    
+    
+
+    
+  </script>
+</body>
+</html>

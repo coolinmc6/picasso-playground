@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picasso Starter</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    body {
+      font: 10px sans-serif;
+    }
+
+    /* Input styling */
+    div {
+      padding-left: 50px;
+      padding-top: 15px;
+      width: 50%;
+      margin: 0 auto;
+      font: 14px;
+    }
+
+    input {
+      border-top: 0;
+      border-left: 0;
+      border-right: 0;
+      text-align: center;
+      font: 14px;
+      width: 60px;
+    }
+
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .x.axis path {
+      display: none;
+    }
+
+    .line {
+      fill: none;
+      stroke-width: 1.5px;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a>
+
+  <div>
+    Number of Lines:
+    <input id="linecount" name="lines" value="4" onkeyup="render()"></input>
+    Points per Line:
+    <input id="pointcount" name="points" value="10" onkeyup="render()"></input>
+  </div>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    console.log(d3)
+
+    const width = 960;
+    const height = 500;
+
+    // Create the standard d3 margin convention
+    const margin = {top: 20, right: 20, bottom: 20, left: 50};
+
+    // Add the svg to the body element and position it
+    const svg = d3.select("body").append("svg")
+      .attr("height", height).attr("width", width)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.right})`) 
+
+    // Create the X and Y Scales => notice there is NO domain because it is dynamic
+    const xScale = d3.scaleLinear().range([0, width - margin.left - margin.right]);
+    const yScale = d3.scaleLinear().range([height - margin.top - margin.bottom, 0]);
+
+    // Create the Line Generator
+    const line = d3.line()
+      .x(d => xScale(d.x))
+      .y(d => yScale(d.y))
+      .curve(d3.curveMonotoneX);
+
+    // Creates new data => Number of Lines x Points per Line
+    function newData(lineNumber, numPoints) {
+      return d3.range(lineNumber).map(() =>
+        d3.range(numPoints).map((item, index) =>
+          ({x: index / (numPoints - 1), y: Math.random() * 100})
+        )
+      );
+    }
+
+    function render(){
+      // generate new data based on inputs
+      const data = newData(
+        document.getElementById("linecount").value, 
+        document.getElementById("pointcount").value
+      );
+
+      // data is array of arrays or objects
+      // outer array is just the "data" variable which holds everything
+      // inner array holds the points of the line
+      // object is just the point: x and y coordinates 
+      console.log(data); 
+
+      // obtain absolute min and max
+      const yMin = data.reduce((pv,cv) => {
+        const currentMin = cv.reduce((pv,cv) => Math.min(pv,cv.y), 100);
+        return Math.min(pv, currentMin);
+      }, 100);
+
+      const yMax = data.reduce((pv,cv) => {
+        const currentMax = cv.reduce((pv,cv) => Math.max(pv,cv.y), 0)
+        return Math.max(pv, currentMax);
+      }, 0);
+
+      // set domain for y-axis
+      yScale.domain([yMin, yMax]);
+
+      // Create y-axis scale
+      const yAxis = d3.axisLeft().scale(yScale);
+
+      // If no axis exists, create one, otherwise update it
+      if (svg.selectAll(".y.axis").empty()){
+        svg.append("g")
+            .attr("class","y axis")
+            .call(yAxis);
+      } else {
+        svg.selectAll(".y.axis")
+          .transition().duration(1500)
+          .call(yAxis);
+      }
+      
+      // generate line paths
+      const lines = svg.selectAll(".line")
+        .data(data)
+        .attr("class", "line");
+
+      
+      // exit
+      lines.exit()
+        .remove();
+      
+      // enter any new data
+      lines.enter()
+        .append("path")
+        .attr("class", "line")
+        .attr("d", line)
+        .style("stroke", () =>
+          '#' + Math.floor(Math.random() * 16777215).toString(16)
+        )
+        // Update new data
+        .merge(lines)
+          .transition().duration(1500)
+          .attr("d", line)
+          .style("stroke", () =>
+            '#' + Math.floor(Math.random() * 16777215).toString(16)
+          );
+    }
+
+    // initial page render
+    render();
+
+    // continuous page render
+    setInterval(render, 5000);
+
+    
+  </script>
+</body>
+</html>
