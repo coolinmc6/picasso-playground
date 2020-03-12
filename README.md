@@ -10,6 +10,7 @@ See the charts in this playground live on [https://coolinmc6.github.io/picasso-p
 |Line|||[Line Chart #1](https://coolinmc6.github.io/picasso-playground/d3-random/line-chart1.html)<br>[Line Chart #2](https://coolinmc6.github.io/picasso-playground/d3-random/line-chart2.html)<br>[Line Chart #3](https://coolinmc6.github.io/picasso-playground/d3-random/line-chart3.html)<br>[Line Chart #4](https://coolinmc6.github.io/picasso-playground/d3-random/line-chart4.html)<br>|
 |Point Distribution||||
 |Scatterplot||||
+|Enter-Exit-Update Pattern|||[Enter-Exit-Update](https://coolinmc6.github.io/picasso-playground/d3-random/enter-exit.html)|
 
 ## Links and Sources
 
