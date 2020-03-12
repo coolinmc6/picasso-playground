@@ -4,12 +4,22 @@ See the charts in this playground live on [https://coolinmc6.github.io/picasso-p
 
 ## Chart Directory
 
-|Chart|Picasso.js Example|My Work|
-|:---:|:---|:---|
-|Bar with Labels|||
-|Line|||
-|Point Distribution|||
-|Scatterplot|||
+|Chart|Picasso.js Example|My Work|D3|
+|:---:|:---|:---|:---|
+|Bar with Labels||||
+|Line||||
+|Point Distribution||||
+|Scatterplot||||
+
+## Links and Sources
+
+**Picasso.js**
+
+
+**D3**
+
+- [D3 vs D5 Line Chart](https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89)
+  - great checklist of items to build a line chart
 
 ## Building a Picasso Chart
 
@@ -317,3 +327,5 @@ picasso.chart({
 It is how we categorize the data. In Picasso, the **dimension is the major scale**.
 
 - [https://data-warehouses.net/glossary/datadimensions.html](https://data-warehouses.net/glossary/datadimensions.html)
+
+

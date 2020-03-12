@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picasso Starter</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    /* 13. Basic Styling with CSS */
+
+    /* Style the lines by removing the fill and applying a stroke */
+    .line {
+        fill: none;
+        stroke: #ffab00;
+        stroke-width: 3;
+    }
+      
+    .overlay {
+      fill: none;
+      pointer-events: all;
+    }
+
+    /* Style the dots by assigning a fill and stroke */
+    .dot {
+        fill: #ffab00;
+        stroke: #fff;
+    }
+      
+      .focus circle {
+      fill: none;
+      stroke: steelblue;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a> | This chart is based on this <a href="https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89">example</a>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    /*
+    Here is the checklist this example works from:
+      1. Add an SVG to draw our line chart on
+      2. Use the D3 standard margin convention
+      3. Create an x axis
+      4. Create a y axis
+      5. Create an x scale
+      6. Create a y scale
+      7. Create a line generator
+      8. Create a random dataset
+      9. Create a path object for the line
+      10. Bind the data to the path object
+      11. Call the line generator on the data-bound path object
+      12. Add circles to show each datapoint
+      13. Add some basic styling to the chart so its easier on the eyes
+    
+    This is MY Checklist
+      1. Use the standard D3 margin convention
+      1b. Create fake data set
+      2. Create X and Y Scales
+      3. Create the Line Generator
+      4. Add the svg to the page
+      5. Create the X and Y Axes
+      6. Add the Line
+      7. Add the Points
+    */
+    
+    // #1 - use the margin convention practice
+    const margin = {top: 50, right: 50, bottom: 50, left: 50};
+    const width = window.innerWidth - margin.left - margin.right;
+    const height = window.innerHeight - margin.top - margin.bottom;
+
+    // Create Fake Dataset
+    const n = 21;
+    const dataset = d3.range(n).map((d) => { return {y: Math.random()}})
+    console.log(dataset)
+
+    // #2 - Create X and Y Scales
+    const xScale = d3.scaleLinear().domain([0, n-1]).range([0, width])
+    const yScale = d3.scaleLinear().domain([0, 1]).range([height, 0])
+
+    // #3 - Create Line Generator
+    const line = d3.line()
+                  .x((d,i) => xScale(i))
+                  .y((d) => yScale(d.y))
+                  .curve(d3.curveMonotoneX)
+    
+    // #4 - Add the svg to the page and use the margin
+    const svg = d3.select('body').append('svg')
+                  .attr('width', width + margin.left + margin.right)
+                  .attr('height', height + margin.top + margin.bottom)
+                  .append('g')
+                  .attr('transform', `translate(${margin.left},${margin.right})`)
+    
+    // #5 - Create the X and Y Axes
+    svg.append('g').attr('class', 'x-axis')
+      .attr('transform', `translate(0, ${height})`)
+      .call(d3.axisBottom(xScale))
+    
+    svg.append('g').attr('class', 'y-axis')
+      .attr('transform', `translate(0,0)`) // this is not needed but it shows an important point
+      .call(d3.axisLeft(yScale))
+
+    // #6 - Add the Line
+    svg.append('path')
+      .datum(dataset) // binds the data to the line
+      .attr('class', 'line')
+      .attr('d', line); // calls the line generator
+
+    // #7 - Add the Points
+    svg.selectAll('.dot')
+      .data(dataset)
+      .enter().append('circle')
+      .attr('class', 'dot')
+      .attr('cx', (d,i) => xScale(i))
+      .attr('cy', (d) => yScale(d.y))
+      .attr('r', 5)
+
+
+
+    
+  </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picasso Starter</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://unpkg.com/picasso.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #container {
+      /* height: 100%; */
+      max-width: 1100px;
+      min-height: 600px;
+      position: relative;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a>
+  <div id="container"></div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    // #1 - Build Fake Data
+    let truth = 40;
+    let power = 50;
+    const steps = new Array(50).fill('').map((item, i) => {
+      const step = i + 1;
+      const direction = Math.random() < 0.5
+      const str = Math.random()*3
+      truth += (direction ? Math.random() : Math.random() * -1)*str
+      power += (direction ? Math.random()*-1 : Math.random())*str
+      return [step, truth, power]
+    })
+
+    console.log(steps);
+
+    const data = [
+      {
+        type: 'matrix',
+        data: [
+          ['Step', 'Truth', 'Power'],
+          ...steps
+        ]
+      }
+    ]
+
+    // #2 - Create Scales
+    const xScale = {
+      data: { field: 'Step' }
+    }
+
+    const yScale = {
+      data: { field: 'Truth' }, invert: true, expand: 0.1,/*domain: [0, 100]*/
+    }
+
+    const yScale2 = {
+      data: { field: 'Power' }, invert: true, expand: 0.1
+    }
+
+    // #3 - Create Axes
+    const xAxis = {
+      type: 'axis',
+      key: 'x-axis',
+      dock: 'bottom',
+      scale: 'xScale'
+    }
+
+    const yAxis = {
+      type: 'axis',
+      key: 'y-axis', 
+      dock: 'left',
+      scale: 'yScale'
+    }
+
+    const yAxis2 = {
+      type: 'axis',
+      key: 'y-axis', 
+      dock: 'right',
+      scale: 'yScale2'
+    }
+
+    // #4 - Create Line
+    const buildLine = ({ y, x, ref, stroke, dash }) => {
+
+      return {
+        type: 'line',
+        data: { collection: 'lines' },
+        settings: {
+          coordinates: {
+            major: { scale: x },
+            minor: { scale: y, ref }
+          },
+          layers: {
+            curve: 'monotone',
+            line: {
+              stroke,
+              strokeDasharray: dash
+            }
+          }
+        }
+      }
+    }
+
+    const collection = {
+      key: 'lines',
+      data: {
+        extract: {
+          field: 'Step',
+          props: {
+            truth: { field: 'Truth' },
+            power: { field: 'Power' }
+          }
+        }
+      }
+    }
+
+    // #5 - Build Chart
+    picasso.chart({
+      element: document.getElementById('container'),
+      data,
+      settings: {
+        collections: [collection],
+        scales: { xScale, yScale, yScale2 },
+        components: [
+          xAxis,
+          yAxis,
+          yAxis2,
+          buildLine({ y: yScale, x: xScale, ref: 'truth', stroke: '#4d53ff'}),
+          buildLine({ y: yScale2, x: xScale, ref: 'power', stroke: '#990000'})
+        ]
+      }
+    })
+  </script>
+</body>
+</html>

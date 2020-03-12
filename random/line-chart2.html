@@ -88,7 +88,102 @@
       }
     ];
 
+    // #2 - Create the Scales
+    const yScale = {
+      data: { field: 'Sales' }, invert: true, expand: 0.05
+    }
+
+    // const xScale = {
+    //   data: { extract: { field: 'Year' } }
+    // }
+
+    const xScale = {
+      data: { field: 'Year' }
+    }
+
+    const yScale2 = {
+      data: { field: 'Margin'} , invert: true, expand: 0.1
+    }
+
+    // #3 - Create Axes
+    const yAxis = {
+      type: 'axis', 
+      scale: 'yScale',
+      key: 'y-axis',
+      dock: 'left'
+    }
+
+    const yAxis2 = {
+      type: 'axis',
+      scale: 'yScale2',
+      key: 'y-axis2',
+      dock: 'right'
+    }
+
+    const xAxis = {
+      type: 'axis',
+      scale: 'xScale',
+      key: 'x-axis',
+      dock: 'bottom',
+      formatter: {
+        type: 'd3-time',
+        format: '%Y-%m'
+      }
+    }
+
+    const collection = {
+      key: 'lines',
+      data: {
+        extract: {
+          field: 'Year',
+          props: {
+            margin: { field: 'Margin' },
+            sales: { field: 'Sales' }
+          }
+        }
+      }
+    }
+
+    // #4 - Build Line
+    const buildLine = ({ y, x, ref, stroke, dash }) => {
+
+      return {
+        type: 'line',
+        data: { collection: 'lines' },
+        settings: {
+          coordinates: {
+            major: { scale: x },
+            minor: { scale: y, ref }
+          },
+          layers: {
+            curve: 'monotone',
+            line: {
+              stroke,
+              strokeDasharray: dash
+            }
+          }
+        }
+      }
+    }
+
     
+
+
+    // #5 - Build Chart
+    picasso.chart({
+      element: document.getElementById('container'),
+      data,
+      settings: {
+        collections: [collection],
+        scales: { yScale, xScale, yScale2 },
+        components: [ 
+          yAxis, yAxis2,
+          xAxis,
+          buildLine({ x: xScale, y: yScale, ref: 'sales', stroke: '#ff0000'}),
+          buildLine({ x: xScale, y: yScale2, ref: 'margin', dash: '4 2'}),
+        ]
+      }
+    })
       
   </script>
 </body>
