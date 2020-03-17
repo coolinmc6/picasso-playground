@@ -1,0 +1,13 @@
+body.index {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+body.index h1 {
+  grid-column: 1/3;
+}
+
+body.index .section {
+  grid-column: span 1;
+}
+

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>D3 Starter</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    .line {
+      stroke-width: 2px;
+      fill: none;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a> | <a href="https://github.com/coolinmc6/picasso-playground">GitHub Repo</a> <br><br>
+  <button class="add-data">Add Data</button><br>
+  <div id="container"></div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+
+    const width = 960;
+    const height = 500;
+
+    // Create the standard d3 margin convention
+    const margin = {top: 20, right: 20, bottom: 20, left: 50};
+    
+    const data = [[40], [50], [20], [75]]
+
+    // Add svg to page
+    const svg = d3.select('body').append('svg')
+                  .attr('height', height).attr('width', width)
+                  .append('g')
+                  .attr('transform', `translate(${margin.left},${margin.right})`)
+
+    function render() {
+      // Create Scales
+      let xScale = d3.scaleLinear().range([0, width - margin.left - margin.right]).domain([0, data[0].length-1])
+      let yScale = d3.scaleLinear().range([height - margin.top - margin.bottom, 0]).domain([0, 100])
+
+      // Create the Line Generator
+      const line = d3.line().x((d,i) => xScale(i)).y((d) => yScale(d)).curve(d3.curveMonotoneX);
+
+      // Create Axes
+      let yAxis = d3.axisLeft().scale(yScale);
+      let xAxis = d3.axisBottom().scale(xScale).ticks(data[0].length-1)
+
+      if(svg.selectAll('.y-axis').empty()) {
+        svg.append('g').attr('class', 'y-axis').call(yAxis)
+      } else {
+        svg.selectAll(".y-axis").transition().duration(1500).call(yAxis);
+      }
+
+      if(svg.selectAll('.x-axis').empty()) {
+        svg.append('g').attr('class', 'x-axis').attr('transform', `translate(0,${height - margin.top - margin.bottom})`).call(xAxis)
+      } else {
+        svg.selectAll(".x-axis").transition().duration(1500).call(xAxis);
+      }
+
+      // Create Line
+      const lines = svg.selectAll('.line').data(data).attr('class', 'line')
+
+      lines.exit().remove();
+
+      lines.enter().append('path')
+        .attr('class', 'line')
+        .attr('d', line)
+        .style('stroke', (d, i) => {
+          return i === 0 ? '#0984e3' : i === 1 ? '#d63031' : i === 2 ? '#99000066' : '#00009966';
+        })
+        .style('stroke-dasharray', (d,i) => {
+          return i > 1 ? '8 4' : '';
+        })
+        .merge(lines)
+        .transition().duration(500)
+        .attr("d", line)
+    }
+
+    render();
+
+    $('.add-data').on('click', function() {
+      const len = data[0].length
+      const truth = data[0][len - 1] + Math.floor(Math.random() * 20 - 9.5) 
+      const power = data[1][len - 1] + Math.floor(Math.random() * 20 - 9.5) 
+      data[0].push(truth);
+      data[1].push(power)
+      data[2].push(20)
+      data[3].push(75)
+      render();
+    })
+    
+  </script>
+</body>
+</html>

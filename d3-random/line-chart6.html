@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>D3 Starter</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    .line {
+      stroke-width: 2px;
+      fill: none;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a>
+  <div id="container"></div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    // #1 - Data
+    //      This variable is an array of arrays. So if it is just an array, it won't work. It needs an
+    //      outer parent array
+    const data = [
+      [1,2,3,4,5,1,2,1,5,2,5,0,4,5,1,2],
+      new Array(15).fill('').map(d => Math.round(Math.random()*10))
+    ]
+
+    // #2 - Margin Convention
+    //      The margin object, "margin", is easy to understand - the height and width all depend
+    //      In this example, "height" and "width" refer to the size of the svg
+    //      The chart is then scaled down by those dimensions: height - margin.top - margin.bottom
+    //      and width - margin.left - margin.right
+    const margin = {top: 50, right: 30, bottom: 50, left: 50}
+    const height = 500;
+    const width = 800;
+
+    // #3 - Create Scales
+    //      The xScale is easy to understand and as said above, only as wide as the width minus left and right margins
+    //      The yScale is tougher because I am starting with
+    const xScale = d3.scaleLinear().range([0, width - margin.left - margin.right]).domain([0, data[0].length-1])
+    const yScale = d3.scaleLinear().range([height - margin.top - margin.bottom, 0]).domain([0,10])
+
+    const svg = d3.selectAll('#container').append('svg')
+                  .attr('height', height).attr('width', width)
+                  .append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+    
+    // Create and Add Axes                  
+    const xAxis = d3.axisBottom().scale(xScale)
+    const yAxis = d3.axisLeft().scale(yScale);
+
+    if(d3.selectAll('.y-axis').empty()) {
+      svg.append('g').attr('class', 'y-axis').call(yAxis)
+    }
+
+    if(d3.selectAll('.x-axis').empty()) {
+      svg.append('g').attr('class', 'x-axis').call(xAxis).attr('transform', `translate(${0}, ${height - margin.top - margin.bottom})`)
+    }
+
+    // Line Builder
+    const line = d3.line().x((d,i) => xScale(i)).y((d) => yScale(d)).curve(d3.curveMonotoneX);
+
+    // Add the actual line
+    const lines = svg.selectAll('.line').data(data).attr('class', 'line')
+    lines.exit().remove();
+
+    lines.enter().append('path')
+      .attr('class', 'line')
+      .attr('d', line)
+      .style('stroke', (d) => {
+        return '#' + Math.floor(Math.random() * 16777215).toString(16)
+      })
+      .attr('stroke-dasharray', 0)
+      .merge(lines)
+      .transition().duration(500)
+      .attr("d", line)
+      .style('stroke', (d) => {
+        return '#' + Math.floor(Math.random() * 16777215).toString(16)
+      })
+
+
+
+
+
+
+    
+  </script>
+</body>
+</html>
