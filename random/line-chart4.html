@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picasso Starter</title>
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon">
+  <script src="https://unpkg.com/picasso.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #container {
+      /* height: 100%; */
+      max-width: 1100px;
+      min-height: 600px;
+      position: relative;
+    }
+    </style>
+</head>
+<body>
+  <a href="../index.html">Back</a> | <a href="https://github.com/coolinmc6/picasso-playground">GitHub Repo</a> <br><br>
+  <div id="container"></div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    // #1 - Build Fake Data
+    let line1 = 80;
+    let line2 = 50;
+    let line3 = 30
+    // const steps = new Array(12).fill('').map((item, i) => {
+    //   // const step = i + 1;
+    //   // const direction = Math.random() < 0.5
+    //   // const str = Math.random()*3
+    //   // line1 += (direction ? Math.random() : Math.random() * -1)*str
+    //   // line2 += (direction ? Math.random()*-1 : Math.random())*str
+    //   // line3 += Math.random()*2 - 1
+
+    //   if(i < 4) {
+    //     line1 += -13 * Math.random();
+    //     line2 += -7 * Math.random();
+    //     line3 += -5 * Math.random();
+    //   } else if(i < 8) {
+    //     line1 += Math.random() - 0.5
+    //     line2 += Math.random() - 0.5
+    //     line3 += Math.random() - 0.5
+    //   } else {
+    //     line1 += 5 * Math.random();
+    //     line2 += 2 * Math.random();
+    //     line3 += 1 * Math.random();
+    //   }
+
+
+    //   return [i+1, line1, line2, line3]
+    // })
+
+    // console.log(steps);
+    const steps = [
+      [90, 60, 40],
+      [87, 62, 38],
+      [84, 56, 35],
+      [80, 50, 40],
+      [60, 45, 39],
+      [65, 40, 45],
+      [50, 45, 40],
+      [60, 40, 38],
+      [70, 50, 32],
+      [88, 65, 40],
+      [84, 56, 35],
+      [77, 50, 33],
+    ].map((arr, i) => {
+      return [i+1, ...arr]
+    })
+
+    const steps2 = steps.map(array => {
+      const rand1 = Math.round(Math.random() * 10 - 5)
+      const rand2 = Math.round(Math.random() * 10 - 5)
+      const rand3 = Math.round(Math.random() * 10 - 5)
+      return [array[0], array[1] + rand1, array[2] + rand2, array[3] + rand3 ]
+    })
+
+    const newSteps = (steps) => {
+      return steps.map(array => {
+        const rand1 = Math.round(Math.random() * 10 - 5)
+        const rand2 = Math.round(Math.random() * 10 - 5)
+        const rand3 = Math.round(Math.random() * 10 - 5)
+        return [array[0], array[1] + rand1, array[2] + rand2, array[3] + rand3 ]
+      })
+    }
+
+    const returnData = (steps) => {
+      return [
+        {
+          type: 'matrix',
+          data: [
+            ['Step', 'Line 1', 'Line 2', 'Line 3'],
+            ...steps
+          ]
+        }
+      ]
+    }
+
+    const data = [
+      {
+        type: 'matrix',
+        data: [
+          ['Step', 'Line 1', 'Line 2', 'Line 3'],
+          ...steps
+        ]
+      }
+    ]
+
+    const data2 = [
+    {
+        type: 'matrix',
+        data: [
+          ['Step', 'Line 1', 'Line 2', 'Line 3'],
+          ...steps2
+        ]
+      }
+    ]
+
+    // #2 - Create Scales
+    const xScale = {
+      data: { field: 'Step' }
+    }
+
+    const yScale = {
+      data: { field: 'Line 1' }, invert: true, expand: 0.1,/*domain: [0, 100]*/
+      min: 20, 
+      max: 100
+    }
+
+    const yScale2 = {
+      data: { field: 'Line 2' }, invert: true, expand: 0.1
+    }
+
+    // #3 - Create Axes
+    const xAxis = {
+      type: 'axis',
+      key: 'x-axis',
+      dock: 'bottom',
+      scale: 'xScale'
+    }
+
+    const yAxis = {
+      type: 'axis',
+      key: 'y-axis', 
+      dock: 'left',
+      scale: 'yScale'
+    }
+
+    // #4 - Create Line
+    const buildLine = ({ y, x, ref, stroke, dash, areaFill }) => {
+
+      return {
+        type: 'line',
+        data: { collection: 'lines' },
+        settings: {
+          coordinates: {
+            major: { scale: x },
+            minor: { scale: y, ref }
+          },
+          layers: {
+            // curve: 'monotone',
+            line: {
+              stroke,
+              strokeDasharray: dash,
+              boxShadow: '0px 0px 15px #ddd'
+
+            },
+            area: {
+              fill: areaFill || '#ddd',
+
+            }
+          }
+        }
+      }
+    }
+
+    const collection = {
+      key: 'lines',
+      data: {
+        extract: {
+          field: 'Step',
+          props: {
+            line1: { field: 'Line 1' },
+            line2: { field: 'Line 2' },
+            line3: { field: 'Line 3' }
+          }
+        }
+      }
+    }
+
+    // #5 - Build Chart
+    const chart = picasso.chart({
+      element: document.getElementById('container'),
+      data,
+      settings: {
+        collections: [collection],
+        scales: { xScale, yScale, yScale2 },
+        components: [
+          xAxis,
+          yAxis,
+          // yAxis2,
+          buildLine({ y: yScale, x: xScale, ref: 'line1', stroke: '#eee', areaFill: '#eee'}),
+          buildLine({ y: yScale, x: xScale, ref: 'line2', stroke: '#ccc', areaFill: '#ccc'}),
+          buildLine({ y: yScale, x: xScale, ref: 'line3', stroke: '#999', areaFill: '#999'})
+        ]
+      }
+    })
+
+    let currData = data;
+
+    setInterval(() => {
+      currData = returnData(newSteps(steps))
+      chart.update({
+        data: currData
+      })
+    }, 3000)
+    
+  </script>
+</body>
+</html>
